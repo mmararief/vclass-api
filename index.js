@@ -3,8 +3,7 @@ const puppeteer = require('puppeteer');
 
 const app = express();
 
-
-app.get('/', async (req, res) => {
+app.get('/upcoming', async (req, res) => {
   try {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
