@@ -5,7 +5,7 @@ const app = express();
 
 app.get('/upcoming', async (req, res) => {
   try {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
 
     // navigasi ke halaman login
