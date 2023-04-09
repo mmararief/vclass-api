@@ -41,7 +41,7 @@ app.get('/upcoming', async (req, res) => {
         const link = linkElement ? linkElement.href : '';
 
         // cek apakah data kosong
-        if (name === '' || date === '' || eventType === '' || description === '' || course === '' || link === '') {
+        if (name === '') {
           return null;
         }
 
