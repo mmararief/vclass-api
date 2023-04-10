@@ -3,21 +3,25 @@ const puppeteer = require('puppeteer');
 
 const app = express();
 
+let page; // simpan sesi login
+
 app.get('/upcoming', async (req, res) => {
   try {
-    const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
-    const page = await browser.newPage();
+    if (!page) { // jika belum ada sesi login
+      const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+      page = await browser.newPage();
 
-    // navigasi ke halaman login
-    await page.goto('https://v-class.gunadarma.ac.id/login/index.php');
+      // navigasi ke halaman login
+      await page.goto('https://v-class.gunadarma.ac.id/login/index.php');
 
-    // isi formulir login
-    await page.type('#username', 'ammararief@student.gunadarma.ac.id'); // ganti dengan username Anda
-    await page.type('#password', 'Prima12345'); // ganti dengan password Anda
-    await page.click('#loginbtn');
+      // isi formulir login
+      await page.type('#username', 'ammararief@student.gunadarma.ac.id'); // ganti dengan username Anda
+      await page.type('#password', 'Prima12345'); // ganti dengan password Anda
+      await page.click('#loginbtn');
 
-    // tunggu hingga halaman terbuka setelah login
-    await page.waitForNavigation();
+      // tunggu hingga halaman terbuka setelah login
+      await page.waitForNavigation();
+    }
 
     // navigasi ke halaman yang akan di-scrape
     await page.goto('https://v-class.gunadarma.ac.id/calendar/view.php?view=upcoming', { timeout: 0 });
@@ -55,8 +59,6 @@ app.get('/upcoming', async (req, res) => {
         };
       }).filter(card => card !== null) // filter data yang kosong
     );
-
-    await browser.close();
 
     res.json(cards);
   } catch (err) {
