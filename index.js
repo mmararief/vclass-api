@@ -7,16 +7,14 @@ let page; // simpan sesi login
 
 app.get('/upcoming', async (req, res) => {
   try {
-    if (!page) { // jika belum ada sesi login
+    if (!page) { 
       const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
       page = await browser.newPage();
-
-      // navigasi ke halaman login
       await page.goto('https://v-class.gunadarma.ac.id/login/index.php');
 
-      // isi formulir login
-      await page.type('#username', 'ammararief@student.gunadarma.ac.id'); // ganti dengan username Anda
-      await page.type('#password', 'Prima12345'); // ganti dengan password Anda
+
+      await page.type('#username', 'ammararief@student.gunadarma.ac.id'); 
+      await page.type('#password', 'Prima12345'); 
       await page.click('#loginbtn');
 
       // tunggu hingga halaman terbuka setelah login
