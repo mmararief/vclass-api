@@ -3,28 +3,43 @@ const puppeteer = require('puppeteer');
 
 const app = express();
 
-let page; // simpan sesi login
+let browser;
+let page;
+
+const login = async () => {
+  browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+  page = await browser.newPage();
+  await page.goto('https://v-class.gunadarma.ac.id/login/index.php');
+
+  await page.type('#username', 'ammararief@student.gunadarma.ac.id');
+  await page.type('#password', 'Prima12345');
+  await page.click('#loginbtn');
+
+  // Tunggu hingga halaman terbuka setelah login
+  await page.waitForNavigation();
+};
 
 app.get('/upcoming', async (req, res) => {
   try {
-    if (!page) { 
-      const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
-      page = await browser.newPage();
-      await page.goto('https://v-class.gunadarma.ac.id/login/index.php');
+    if (!page) {
+      // Jika belum ada sesi login, lakukan login pertama kali
+      await login();
+    } else {
+      // Cek apakah sesi login masih valid dengan mengunjungi halaman beranda
+      const homePage = await page.goto('https://v-class.gunadarma.ac.id/', { timeout: 5000, waitUntil: 'domcontentloaded' });
+      const isLoggedIn = homePage.url() !== 'https://v-class.gunadarma.ac.id/login/index.php';
 
-
-      await page.type('#username', 'ammararief@student.gunadarma.ac.id'); 
-      await page.type('#password', 'Prima12345'); 
-      await page.click('#loginbtn');
-
-      // tunggu hingga halaman terbuka setelah login
-      await page.waitForNavigation();
+      if (!isLoggedIn) {
+        // Jika sesi login tidak valid, lakukan login ulang
+        await browser.close();
+        await login();
+      }
     }
 
-    // navigasi ke halaman yang akan di-scrape
+    // Navigasi ke halaman yang akan di-scrape
     await page.goto('https://v-class.gunadarma.ac.id/calendar/view.php?view=upcoming', { timeout: 0 });
 
-    // ambil data dari semua card pada halaman
+    // Ambil data dari semua card pada halaman
     const cards = await page.$$eval('.card', elements =>
       elements.map(element => {
         const nameElement = element.querySelector('.name');
@@ -34,7 +49,7 @@ app.get('/upcoming', async (req, res) => {
         const courseElement = element.querySelector('.col-xs-11:last-child a');
         const linkElement = element.querySelector('.card-footer .card-link');
 
-        // cek apakah elemen ada sebelum mengambil teks
+        // Cek apakah elemen ada sebelum mengambil teks
         const name = nameElement ? nameElement.textContent : '';
         const date = dateElement ? dateElement.textContent : '';
         const eventType = eventTypeElement ? eventTypeElement.textContent : '';
@@ -42,7 +57,7 @@ app.get('/upcoming', async (req, res) => {
         const course = courseElement ? courseElement.textContent : '';
         const link = linkElement ? linkElement.href : '';
 
-        // cek apakah data kosong
+        // Cek apakah data kosong
         if (name === '') {
           return null;
         }
@@ -55,9 +70,8 @@ app.get('/upcoming', async (req, res) => {
           course,
           link,
         };
-      }).filter(card => card !== null) // filter data yang kosong
+      }).filter(card => card !== null) // Filter data yang kosong
     );
-
     res.json(cards);
   } catch (err) {
     console.error(err);
