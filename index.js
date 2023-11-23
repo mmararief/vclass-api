@@ -2,7 +2,6 @@ const express = require('express');
 const puppeteer = require('puppeteer');
 
 const app = express();
-
 let browser;
 let page;
 
@@ -30,7 +29,7 @@ app.get('/upcoming', async (req, res) => {
       const isLoggedIn = homePage.url() !== 'https://v-class.gunadarma.ac.id/login/index.php';
 
       if (!isLoggedIn) {
-        // Jika sesi login tidak valid, lakukan login ulang
+
         await browser.close();
         await login();
       }
