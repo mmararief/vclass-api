@@ -132,30 +132,30 @@ io.on('connection', function(socket){
     client.on('ready', () => {
         socket.emit('ready', 'Whatsapp is ready');
         socket.emit('message', 'Whatsapp is ready');
-        const chatId = '628872588744@c.us'; // ganti dengan nomor WhatsApp 
-        let lastMessage = '';
+        // const chatId = '628872588744@c.us'; // ganti dengan nomor WhatsApp 
+        // let lastMessage = '';
 
-        setInterval(() => {
-            axios.get('https://apivclass.herokuapp.com/upcoming')
-                .then(response => {
-                    const newData = response.data;
+        // setInterval(() => {
+        //     axios.get('https://apivclass.herokuapp.com/upcoming')
+        //         .then(response => {
+        //             const newData = response.data;
 
-                    if (JSON.stringify(newData) !== lastMessage) {
-                        lastMessage = JSON.stringify(newData);
-                        let message = '';
-                        const now = new Date();
-                        message += `Bot melihat ada perubahan tugas tanggal ${now.toLocaleDateString()} pukul ${now.toLocaleTimeString()}\n\n`;
-                        newData.forEach(tugas => {
-                            message += `📝 *${tugas.name}*\n📅 Deadline: ${tugas.date}\n🔗 Link: ${tugas.link}\n\n`;
-                        });
+        //             if (JSON.stringify(newData) !== lastMessage) {
+        //                 lastMessage = JSON.stringify(newData);
+        //                 let message = '';
+        //                 const now = new Date();
+        //                 message += `Bot melihat ada perubahan tugas tanggal ${now.toLocaleDateString()} pukul ${now.toLocaleTimeString()}\n\n`;
+        //                 newData.forEach(tugas => {
+        //                     message += `📝 *${tugas.name}*\n📅 Deadline: ${tugas.date}\n🔗 Link: ${tugas.link}\n\n`;
+        //                 });
 
-                        client.sendMessage(chatId, message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Failed to fetch data from API endpoint:', error);
-                });
-        }, 60000);
+        //                 client.sendMessage(chatId, message);
+        //             }
+        //         })
+        //         .catch(error => {
+        //             console.error('Failed to fetch data from API endpoint:', error);
+        //         });
+        // }, 60000);
 
 
         });
